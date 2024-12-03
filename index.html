@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Consulta Pokémon con GraphQL Simulado</title>
+</head>
+<body>
+    <h1>Información sobre Pokémon</h1>
+    <input type="text" id="pokemonName" placeholder="Introduce un Pokémon" value="pikachu">
+    <button id="loadDataBtn">Cargar Pokémon</button>
+    <div id="pokemonInfo"></div>
+
+    <script>
+        // La URL base de la API de Pokémon
+        const POKEAPI_URL = 'https://pokeapi.co/api/v2/pokemon/';
+
+        // Función que hace la consulta sobre un Pokémon
+        async function fetchPokemon() {
+            const pokemonName = document.getElementById('pokemonName').value.toLowerCase();
+            const url = `${POKEAPI_URL}${pokemonName}`;
+
+            try {
+                const response = await fetch(url);
+                if (!response.ok) {
+                    throw new Error('Pokémon no encontrado');
+                }
+
+                const data = await response.json();
+
+                // Mostramos la información del Pokémon
+                const pokemonInfo = document.getElementById('pokemonInfo');
+                pokemonInfo.innerHTML = `
+                    <h2>${data.name.toUpperCase()}</h2>
+                    <img src="${data.sprites.front_default}" alt="${data.name}" />
+                    <p><strong>Altura:</strong> ${data.height / 10} m</p>
+                    <p><strong>Peso:</strong> ${data.weight / 10} kg</p>
+                    <p><strong>Habilidades:</strong> ${data.abilities.map(a => a.ability.name).join(', ')}</p>
+                `;
+
+            } catch (error) {
+                console.error(error);
+                document.getElementById('pokemonInfo').innerHTML = `<p>${error.message}</p>`;
+            }
+        }
+
+        // Asignamos el evento para cargar la información del Pokémon al hacer clic en el botón
+        document.getElementById('loadDataBtn').addEventListener('click', fetchPokemon);
+    </script>
+</body>
+</html>
